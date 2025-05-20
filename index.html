@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Design Playground</title>
+  <!-- Add Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-green: #4CAF50;
+      --primary-orange: #FF9800;
+      --primary-white: #FFFFFF;
+      --dark-green: #388E3C;
+      --dark-orange: #F57C00;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, var(--primary-white), #f5f5f5);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 2rem;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--dark-green);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      color: #555;
+    }
+
+    img {
+      max-width: 90%;
+      height: auto;
+      border-radius: 20px;
+      margin: 2rem 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transform: scale(0.95);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    form {
+      background: var(--primary-white);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    input {
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus {
+      border-color: var(--primary-orange);
+      box-shadow: 0 0 0 3px rgba(255,152,0,0.2);
+      outline: none;
+    }
+
+    button {
+      background-color: var(--primary-green);
+      color: white;
+      padding: 0.9rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover {
+      background-color: var(--dark-green);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background-color: #A5D6A7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .success-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: var(--primary-white);
+      padding: 2rem;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .success-modal.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-content h2 {
+      color: var(--dark-green);
+      margin-bottom: 1rem;
+    }
+
+    .modal-content p {
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    .whatsapp-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #25D366;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .whatsapp-button:hover {
+      background-color: #128C7E;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .whatsapp-button i {
+      margin-right: 8px;
+      font-size: 1.2rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #777;
+      transition: color 0.3s ease;
+    }
+
+    .close-modal:hover {
+      color: var(--primary-orange);
+    }
+
+    footer {
+      margin: 2rem 0;
+      font-size: 0.9rem;
+      color: #777;
+      text-align: center;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-orange);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Design Your World with AI</h1>
+    <p>Bring your wildest ideas to life — characters, thumbnails, scenes, even LEGO-style art! For just 99 Ksh, join the fun. Powered by Freddie × Anonymous.</p>
+  </header>
+
+  <img src="ai-art-sample.jpg" alt="Fun AI-generated art example">
+
+  <form id="waitlistForm">
+    <input type="text" name="name" id="name" placeholder="Your Name" required>
+    <input type="email" name="email" id="email" placeholder="Your Email" required>
+    <input type="tel" name="contact" id="contact" placeholder="Phone or WhatsApp" required>
+    <button type="submit" id="submitButton">
+      Join the AI Waitlist
+      <span class="loading" id="loadingSpinner" style="display: none;"></span>
+    </button>
+  </form>
+
+  <!-- Success Modal -->
+  <div class="success-modal" id="successModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModal">&times;</button>
+      <h2>Welcome to the Waitlist! 🎉</h2>
+      <p>Thank you for joining our AI Design Playground! We're excited to have you on board.</p>
+      <p>For immediate assistance or questions, message us on WhatsApp:</p>
+      <a href="https://wa.me/254750798833" class="whatsapp-button" target="_blank">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Freddie x Anonymous — All rights reserved
+  </footer>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCDYianIs_dLAI2bpBNRPRXVamHDYOhIcE",
+      authDomain: "housingfreeop.firebaseapp.com",
+      databaseURL: "https://housingfreeop-default-rtdb.firebaseio.com",
+      projectId: "housingfreeop",
+      storageBucket: "housingfreeop.appspot.com",
+      messagingSenderId: "369472820914",
+      appId: "1:369472820914:web:019f84d75e8b6ccaa91bab",
+      measurementId: "G-109WEPSSQ7"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // DOM elements
+    const successModal = document.getElementById('successModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    // Close modal function
+    closeModalBtn.addEventListener('click', () => {
+      successModal.classList.remove('active');
+    });
+
+    // Form submission handler
+    document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitButton = document.getElementById('submitButton');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      
+      // Show loading state
+      submitButton.disabled = true;
+      loadingSpinner.style.display = 'inline-block';
+      
+      try {
+        // Get form values
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const contact = document.getElementById('contact').value;
+        
+        // Add to Firestore
+        await db.collection('waitlist').add({
+          name: name,
+          email: email,
+          contact: contact,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          status: 'pending'
+        });
+        
+        // Show success modal
+        successModal.classList.add('active');
+        document.getElementById('waitlistForm').reset();
+        
+        // Create confetti effect
+        createConfetti();
+      } catch (error) {
+        console.error('Error adding document: ', error);
+        alert('There was an error submitting your information. Please try again.');
+      } finally {
+        submitButton.disabled = false;
+        loadingSpinner.style.display = 'none';
+      }
+    });
+
+    // Confetti effect function
+    function createConfetti() {
+      const colors = ['#4CAF50', '#FF9800', '#FFFFFF', '#388E3C', '#F57C00'];
+      const container = document.body;
+      
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = -10 + 'px';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        
+        container.appendChild(confetti);
+        
+        const animationDuration = Math.random() * 3 + 2;
+        
+        confetti.style.animation = `fall ${animationDuration}s linear forwards`;
+        
+        // Create keyframes for falling animation
+        const keyframes = `
+          @keyframes fall {
+            to {
+              transform: translateY(100vh) rotate(${Math.random() * 360}deg);
+              opacity: 0;
+            }
+          }
+        `;
+        
+        // Add style element with keyframes
+        const styleEl = document.createElement('style');
+        styleEl.innerHTML = keyframes;
+        document.head.appendChild(styleEl);
+        
+        // Remove confetti after animation
+        setTimeout(() => {
+          confetti.remove();
+          styleEl.remove();
+        }, animationDuration * 1000);
+      }
+    }
+  </script>
+</body>
+</html>
