@@ -1,0 +1,116 @@
+/* Base styles */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+/* Chat panel animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-panel {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Message bubble styling */
+.message-in {
+    position: relative;
+}
+
+.message-in:before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-right-color: white;
+    border-left: 0;
+}
+
+.dark .message-in:before {
+    border-right-color: #1f2937;
+}
+
+.message-out {
+    position: relative;
+}
+
+.message-out:after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left-color: #dcf8c6;
+    border-right: 0;
+}
+
+.dark .message-out:after {
+    border-left-color: #064e3b;
+}
+
+/* Drag and drop area */
+.drag-active {
+    border: 2px dashed #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .chat-panel {
+        width: 100% !important;
+    }
+    
+    .sidebar {
+        width: 100% !important;
+    }
+    
+    .right-sidebar {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        z-index: 10;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .right-sidebar.open {
+        transform: translateX(0);
+    }
+}
